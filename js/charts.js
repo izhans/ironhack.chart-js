@@ -1,90 +1,155 @@
-Chart.defaults.color = '#fff'
-Chart.defaults.borderColor = '#444'
-
 fetch('https://coasters-api.herokuapp.com/country/Spain')
   .then((response) => response.json())
+  .then((coasters) => {
+    printCoastersCharts(coasters)
+  })
+  .catch((e) => console.error(e))
 
-function printCoastersCharts(coasters) {}
+function printCoastersCharts(coasters) {
+    // console.table(coasters)
 
-function printSpeedChart(redForce, dragonKhan, shambala, tarantula, tornado) {
+    const [redForce, dragonKhan, shambala, tarantula, abismo, tornado] = coasters
+    const selectedCoasters = [redForce, dragonKhan, shambala, tarantula, abismo, tornado]
+    // printSpeedChart(redForce, dragonKhan, shambala, tarantula, abismo, tornado)
+    printSpeedChart1(coasters)
+
+    // printLengthChart(selectedCoasters)
+    printLengthChart1(coasters)
+
+    printHeightChart(selectedCoasters)
+    printInversionsChart(coasters)
+    printMixedChart(coasters)
+}
+
+function printSpeedChart(redForce, dragonKhan, shambala, tarantula, abismo, tornado) {
 
     const data = {
-        labels: [],
+        labels: [redForce.name, dragonKhan.name, shambala.name, tarantula.name, abismo.name, tornado.name],
         datasets: [{
-            data: [],
+            data: [redForce.speed, dragonKhan.speed, shambala.speed, tarantula.speed, abismo.speed, tornado.speed],
             label: 'km/h',
             borderWidth: 2,
-            borderColor: ['rgba(116, 72, 194, 1)', 'rgba(33, 192, 215, 1)', 'rgba(217, 158, 43, 1)', 'rgba(205, 58, 129, 1)', 'rgba(156, 153, 204, 1)', 'rgba(225, 78, 202, 1)'],
-            backgroundColor: ['rgba(116, 72, 194, 0.4)', 'rgba(33, 192, 215, 0.4)', 'rgba(217, 158, 43, 0.4)', 'rgba(205, 58, 129, 0.4)', 'rgba(156, 153, 204, 0.4)', 'rgba(225, 78, 202, 0.4)']
+            borderColor: COLORS.borderColor,
+            backgroundColor: COLORS.backgroundColor
         }]
     }
 
-    let options = {
-        plugins: {
-            legend: {
-                display: false
-            }
-        }
+    let options = OPTIONS.speed
+
+    new Chart('chart1', { type: 'bar', data, options })
+}
+
+function printSpeedChart1(coasters) {
+
+    const data = {
+        labels: coasters.map(c => c.name),
+        datasets: [{
+            data: coasters.map(c => c.speed),
+            label: 'km/h',
+            borderWidth: 2,
+            borderColor: COLORS2.borderColor,
+            backgroundColor: COLORS2.backgroundColor
+        }]
     }
+
+    let options = OPTIONS.speed
 
     new Chart('chart1', { type: 'bar', data, options })
 }
 
 function printLengthChart(selectedCoasters) {
-
-    const options = {
-        plugins: {
-            legend: {
-                position: 'left'
-            }
-        }
+    
+    const data = {
+        labels: selectedCoasters.map((c) => c.name),
+        datasets: [{
+            data: selectedCoasters.map(c => c.length),
+            label: 'm',
+            borderWidth: 2,
+            borderColor: COLORS.borderColor,
+            backgroundColor: COLORS.backgroundColor
+        }]
     }
+
+    const options = OPTIONS.length
+
+    new Chart('chart2', { type: 'doughnut', data, options })
+}
+
+function printLengthChart1(coasters) {
+    
+    const data = {
+        labels: coasters.map((c) => c.name),
+        datasets: [{
+            data: coasters.map(c => c.length),
+            label: 'm',
+            borderWidth: 2,
+            borderColor: COLORS2.borderColor,
+            backgroundColor: COLORS2.backgroundColor
+        }]
+    }
+
+    const options = OPTIONS.length
+
+    new Chart('chart2', { type: 'doughnut', data, options })
 }
 
 function printHeightChart(selectedCoasters) {
-
-    const options = {
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            r: {
-                ticks: { display: false }
-            }
-        }
+    
+    const data = {
+        labels: selectedCoasters.map((c) => c.name),
+        datasets: [{
+            data: selectedCoasters.map(c => c.height),
+            label: 'm',
+            borderWidth: 2,
+            borderColor: COLORS.borderColor,
+            backgroundColor: '#3A177240'
+        }]
     }
+
+    const options = OPTIONS.height
+
+    new Chart('chart3', { type: 'radar', data, options })
 }
 
 function printInversionsChart(selectedCoasters) {
-    const options = {
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            r: {
-                ticks: { display: false }
-            }
-        }
+    const data = {
+        labels: selectedCoasters.map((c) => c.name),
+        datasets: [{
+            data: selectedCoasters.map(c => c.inversions),
+            label: '€',
+            borderWidth: 2,
+            borderColor: COLORS2.borderColor,
+            backgroundColor: COLORS2.backgroundColor
+        }]
     }
+
+    const options = OPTIONS.inversions
+    
+    new Chart('chart4', { type: 'polarArea', data, options })
 }
 
 function printMixedChart(selectedCoasters) {
-
-    const options = {
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
+    const data = {
+        labels: selectedCoasters.map((c) => c.name),
+        datasets: [{
+            data: selectedCoasters.map(c => c.height),
+            label: 'm',
+            borderWidth: 2,
+            borderColor: COLORS2.borderColor,
+            backgroundColor: COLORS2.backgroundColor
         },
-        elements: {
-            line: {
-                tension: 0.4
-            }
-        }
+        {
+            data: selectedCoasters.map(c => c.speed),
+            label: 'km/h',
+            borderWidth: 2,
+            borderColor: 'rgba(101, 101, 101, 1)',
+            backgroundColor: 'rgb(101, 101, 101, .4)',
+            type: 'bar',
+            barPercentage: 0.5
+        }]
     }
+
+    const options = OPTIONS.mixed
+
+    new Chart('chart5', { type: 'line', data, options })
 }
